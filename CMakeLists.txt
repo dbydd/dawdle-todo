@@ -15,7 +15,8 @@ FetchContent_MakeAvailable(Slint)
 set(SRC src/main.cpp)
 add_executable(dawdle_todo ${SRC})
 
-set(UI ui/main_window.slint)
+set(UI ui/main_window.slint
+    ui/title_bar.slint)
 slint_target_sources(dawdle_todo ${UI})
 
 target_link_libraries(dawdle_todo PRIVATE Slint::Slint)

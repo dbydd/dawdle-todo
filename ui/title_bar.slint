@@ -1,0 +1,70 @@
+import { VerticalBox } from "std-widgets.slint";
+component DividingLine inherits Rectangle {
+    in-out property <length> default-line-thickness: 3px;
+    in-out property <color> line-color: #ffffffdd;
+    background: line-color;
+    height: default-line-thickness;
+}
+
+component Placeholder inherits TextInput {
+    vertical-alignment: center;
+    horizontal-alignment: center;
+    text: "君子终日乾乾，夕惕若厉，无咎。";  
+    font-size: 28px;
+    wrap: word-wrap;
+    read-only: true;
+    selection-background-color: #2e2e44bb;
+    selection-foreground-color: #d8bebeec;
+}
+
+export component TitleBar inherits Rectangle {
+    property <color> default-color: #1e1e2e88;
+    property <color> default-font-color: #ffffffdd;
+        
+    VerticalLayout {
+        spacing: 5px;
+        width: parent.width;
+        height: parent.height;
+
+        title := Rectangle{
+            vertical-stretch: 8;
+            border-radius: 20px;
+            background: default-color;
+            
+            VerticalBox {
+                spacing: 2px;
+                placeholder-text := Placeholder{
+                    vertical-stretch: 7;
+
+                    TouchArea {
+                        width: parent.width;
+                        height: parent.height;
+                        double-clicked => {
+                            parent.focus();
+                            parent.read-only = false;
+                            if(parent.has-focus){
+                                debug("placeholder is having focus")
+                            }
+                            debug("placeholder double clicked")
+                        }   
+                    }
+
+                }
+                date-text := TextInput{
+                    vertical-stretch: 3;
+                    vertical-alignment: center;
+                    horizontal-alignment: right;
+                    text: "2024-02-08";
+                    color: default-font-color;
+                    font-size: 12px;
+                    read-only: true;
+                    padding-right: 15px;
+                }
+            }
+        }
+
+        dividing-line := DividingLine{}
+    }
+
+    
+}
