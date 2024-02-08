@@ -1,0 +1,34 @@
+export component MainWindow inherits Window {
+    preferred-height: 640px;
+    preferred-width: 480px;
+    background: whitesmoke;
+
+    background-img := Image{
+        width: 100%;
+        height: 100%;
+        source: @image-url("../res/img/banner-main-1.jpg");
+        image-fit: cover;
+        image-rendering: pixelated;
+
+    }
+
+    main-layout := GridLayout {
+        width: 100%;
+        height: 100%;
+        padding: 20px;
+
+        Row{
+            Rectangle {
+                background: #1e1e2e77;
+                height: 20%;
+                border-radius: 20px;
+            }
+        }
+        Row{
+            Rectangle {
+            }
+        }
+
+    }
+
+}
