@@ -1,4 +1,5 @@
 import {TitleBar} from "title_bar.slint";
+import {TodoGroup} from "todo_group.slint";
 import { VerticalBox } from "std-widgets.slint";
 
 export component MainWindow inherits Window {
@@ -19,11 +20,10 @@ export component MainWindow inherits Window {
         height: parent.height * 95%;
         spacing: 5px;
         TitleBar {
-            vertical-stretch: 2;
+            vertical-stretch: 1;
         }
-        Rectangle {
-            background: gray;
-            vertical-stretch: 8;
+        TodoGroup {
+            vertical-stretch: 9;
         }
     }
 }

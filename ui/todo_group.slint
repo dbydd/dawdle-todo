@@ -1,0 +1,79 @@
+import { StandardListView, ListView, CheckBox, VerticalBox} from "std-widgets.slint";
+
+component TodoItem inherits Rectangle{
+    in property <color> bg-color;
+    in property <color> text-color;
+    in property <string> todo-text;
+
+    height: 35px;
+    background: bg-color;
+    border-radius: 15px;
+    HorizontalLayout {
+        spacing: 10px;
+        Rectangle {
+            width: parent.height;
+            height: parent.height;
+        }
+        input := TextInput {
+            text: todo-text;
+            font-size: 14px;
+            color: text-color;
+            read-only: true;
+            padding-left: 5px;
+            vertical-alignment: center;
+
+            TouchArea {
+                width: parent.width;
+                height: parent.height;
+                mouse-cursor: pointer;
+                double-clicked => {
+                    parent.focus();
+                    parent.read-only = false;
+                } 
+            }
+
+            FocusScope {
+                key-pressed(event) => {
+                    //按下esc之后，任务条不保存退出
+                    if(event.text == Key.Escape){
+                        input.read-only = true;
+                        //todo
+                    }
+                    accept
+                
+            }
+        }
+            //input按下回车保存
+            accepted => {
+                self.read-only = true;
+            }
+
+        }
+    }  
+}
+
+export component TodoGroup inherits Rectangle {
+    property <color> default-color: #1e1e2e88;
+    property <color> default-font-color: #ffffffdd;
+
+    VerticalBox {
+        width: parent.width;
+        height: parent.height;
+        spacing: 5px;
+        ListView {
+            for str in ["一帆風順","二龍騰飛","三羊開泰","四季平安","五福臨門", "六六大順","七星高照", "八方來財", "九九同心", "十全十美", "百事亨通", "千事吉祥", "萬事如意"] : Rectangle{
+                VerticalLayout {
+                    TodoItem {
+                        todo-text: str;
+                        bg-color: default-color;
+                        text-color: default-font-color;
+                    }
+                    spacing := Rectangle {
+                        height: 5px;
+                    }
+                }
+            }
+        }
+    }
+
+}
