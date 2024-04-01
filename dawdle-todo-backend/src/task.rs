@@ -1,19 +1,37 @@
-use std::{
-    f32::consts::E,
-    fs::{DirEntry, ReadDir},
-    vec,
-};
+use std::{cell::OnceCell, collections::HashMap, time::SystemTime};
 
-use serde_json::map::Entry;
+use chrono::{DateTime, Local};
+use lazy_static::lazy_static;
+use serde::{Deserialize, Serialize};
 
 use crate::configurations;
 
+lazy_static! {
+    static ref INNERS: HashMap<String, TaskInner> = {
+        let mut map = HashMap::new();
+        TaskInner::init(|i| {
+            map.insert(i.id.to_owned(), i);
+        });
+        map
+    };
+}
+
+#[derive(Serialize, Deserialize)]
 struct TaskInner {
     id: String,
     task_type: TaskType,
-    modifiers: [String],
+    init_prio: usize,
+    modifiers: Vec<String>,
 }
 
+struct Task<'a> {
+    inner: &'a TaskInner,
+    priorty: Option<usize>,
+    completed: bool,
+    last_completed_time: Option<DateTime<Local>>,
+}
+
+#[derive(Serialize, Deserialize)]
 enum TaskType {
     Daily,
     Once,
@@ -21,17 +39,13 @@ enum TaskType {
 }
 
 impl TaskInner {
-    pub(crate) fn init() {
-        configurations::get_configs_at("tasks").flat_map(|dir| match dir {
-            Ok(entry) => match entry.file_type() {
-                Ok(file_type) if file_type.is_file() => std::fs::read_to_string(entry.path())?,
-                Ok(file_type) if file_type.is_dir() => {}
-                Err(err) => println!("err!: {err}"),
-                _ => {}
-            },
-            Err(err) => panic!("err at file:{}", err),
+    pub(crate) fn init<I>(mut into_map: I)
+    where
+        I: FnMut(TaskInner),
+    {
+        configurations::get_configs_at("tasks", |s| {
+            into_map(serde_json::from_str(&s).unwrap());
+            ()
         });
     }
-
-    fn read_folder(dir: ReadDir) {}
 }
