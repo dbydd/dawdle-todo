@@ -5,5 +5,7 @@ mod modifiers;
 mod task;
 
 fn main() {
-    println!("Hello, world!");
+    let mut container = task::TaskContainers::new();
+    loop {}
+    container.write_to_configs();
 }
