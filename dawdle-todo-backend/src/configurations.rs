@@ -4,15 +4,29 @@ use std::{
     io::Read,
 };
 
+pub(crate) fn save_to(path: &str, json: &str) {
+    let mut userhome = dirs::config_dir().expect("error on locate config dir");
+    userhome.push("dawdle_todo");
+    userhome.push(path);
+    if std::fs::try_exists(userhome.as_path()).is_err() {
+        std::fs::create_dir_all(userhome.as_path());
+    }
+
+    std::fs::write(path, json);
+}
+
 pub(crate) fn get_configs_at<FM, R>(s: &str, f: FM) -> Vec<R>
 where
-    FM: FnMut(String) -> R,
+    FM: FnMut((String, String)) -> R,
 {
     read_configs_at(s)
         .flat_map(|dir| match dir {
             Ok(entry) => match entry.file_type() {
                 Ok(file_type) if file_type.is_file() => {
-                    vec![std::fs::read_to_string(entry.path()).unwrap()]
+                    vec![(
+                        entry.path().to_string_lossy().to_string(),
+                        std::fs::read_to_string(entry.path()).unwrap(),
+                    )]
                 }
                 Ok(file_type) if file_type.is_dir() => {
                     let mut vec = Vec::new();
@@ -30,14 +44,15 @@ where
         .collect()
 }
 
-fn solve_dir(dir: DirEntry, ret: &mut Vec<String>) {
+fn solve_dir(dir: DirEntry, ret: &mut Vec<(String, String)>) {
     std::fs::read_dir(dir.path())
         .unwrap()
         .for_each(|f| match f {
             Ok(entry) => match entry.file_type() {
-                Ok(file_type) if file_type.is_file() => {
-                    ret.push(std::fs::read_to_string(entry.path()).unwrap())
-                }
+                Ok(file_type) if file_type.is_file() => ret.push((
+                    entry.path().to_string_lossy().to_string(),
+                    std::fs::read_to_string(entry.path()).unwrap(),
+                )),
                 Ok(file_type) if file_type.is_dir() => solve_dir(entry, ret),
                 Err(err) => {
                     panic!("err!: {err}");
