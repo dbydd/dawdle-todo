@@ -1,8 +1,24 @@
 use std::{
     env::home_dir,
-    fs::{self, DirEntry, File},
+    fs::{self, DirEntry, File, FileType},
     io::Read,
 };
+
+use clap::builder::Str;
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize)]
+struct Configurations {
+    sql_connection_url: Option<String>,
+    task_config_path: Option<String>,
+}
+
+impl Configurations {
+    pub fn new() -> Self {
+        toml::from_str(read_config_at("", "config.toml").unwrap().as_str())
+            .expect("error config file")
+    }
+}
 
 pub(crate) fn save_to(path: &str, json: &str) {
     let mut userhome = dirs::config_dir().expect("error on locate config dir");
@@ -15,7 +31,7 @@ pub(crate) fn save_to(path: &str, json: &str) {
     std::fs::write(path, json);
 }
 
-pub(crate) fn get_configs_at<FM, R>(s: &str, f: FM) -> Vec<R>
+pub(crate) fn get_task_config_at<FM, R>(s: &str, f: FM) -> Vec<R>
 where
     FM: FnMut((String, String)) -> R,
 {
@@ -72,4 +88,19 @@ fn read_configs_at(location: &str) -> fs::ReadDir {
     }
 
     std::fs::read_dir(userhome.as_path()).unwrap()
+}
+
+fn read_config_at(location: &str, fname: &str) -> Result<String, std::io::Error> {
+    std::fs::read_to_string(
+        read_configs_at(location)
+            .filter(|e| {
+                e.as_ref().is_ok_and(|e| {
+                    e.file_type().is_ok_and(|t| t.is_file()) && e.file_name() == fname
+                })
+            })
+            .last()
+            .unwrap()
+            .unwrap()
+            .path(),
+    )
 }

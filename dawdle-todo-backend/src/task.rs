@@ -56,7 +56,7 @@ impl TaskContainers {
     }
 
     fn read_configs(&mut self) {
-        configurations::get_configs_at("tasks", |s| {
+        configurations::get_task_config_at("tasks", |s| {
             let inner = TaskInner::new(&s.1);
             self.id_path_map
                 .insert(inner.id.to_string(), s.0.to_owned());
