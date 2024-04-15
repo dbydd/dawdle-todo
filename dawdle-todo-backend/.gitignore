@@ -1,1 +1,2 @@
-./dawdle-todo-lib/target/*
+./dawdle-todo-lib/Cargo.lock
+dawdle-todo-lib/target/*
